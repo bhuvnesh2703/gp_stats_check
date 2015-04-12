@@ -14,3 +14,32 @@ Python utility to identify tables with outdated statistics involved in a query. 
     Database specific optional arguments: 
     -p PORT, --port=PORT                        Port of database to connect [default: 5432] 
     -d DATABASE, --database=DATABASE            Name of the database to connect [default: template1]
+
+
+##Example output:
+    [INFO]:- Execution started. Please refer to log file name: gp_stats_check_20150411204037.log for details in current working directory.
+    [INFO]:- Input query will be executed using the legacy planner.
+    [INFO]:- No of tables scanned during user query execution: 8.
+    [INFO]:- Stats check in progress, please wait for completion, as it may take time.
+    Tables scanned: 8
+                                                               Stat check summary
+    ----------------------------------------------------------------------------------------------------------------------------------------
+    | Table Name                         | Record Count     | Estimated Count     | Variation     | Comments - based on variation %        |
+    ----------------------------------------------------------------------------------------------------------------------------------------
+    | foo.address                        | 1000             | 1000                | 0             | Stats seems ok                         |
+    | foo.emp_salary                     | 199              | 199                 | 0             | Stats seems ok                         |
+    | foo.emp                            | 1500             | 500                 | 1000          | Stats are outdated, please ANALYZE     |
+    | foo.geography_1_prt_xxypacific     | 50               | 0                   | 50            | Stats are outdated, please ANALYZE     |
+    | foo.geography_1_prt_xxxyindian     | 50               | 0                   | 50            | Stats are outdated, please ANALYZE     |
+    | foo.geography_1_prt_other          | 0                | 0                   | 0             | Stats seems ok                         |
+    ----------------------------------------------------------------------------------------------------------------------------------------
+    [INFO]:- Differences between record count and estimated count higher than 5% variation suggests outdated stats
+    [INFO]:- To analyze tables with outdated stats, please run: psql -d warehouse -f gp_stats_check_20150411204037.sql
+    [INFO]:- Stats check for below tables is not required, as they are either view or top level partition
+    -----------------------------------------------
+    | Table Name        | Table Type              |
+    -----------------------------------------------
+    | foo.salary        | View                    |
+    | foo.geography     | Top level partition     |
+    -----------------------------------------------
+    [INFO]:- Execution finished successfully !!
