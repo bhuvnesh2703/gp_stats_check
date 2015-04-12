@@ -17,7 +17,8 @@ Python utility to identify tables with outdated statistics involved in a query. 
 
 
 ##Example output:
-Note: With Greenplum new optimizer ORCA, stats on top level partitions are important and are used for evaluating best plan. Statistics on child partitions are not required. Yet to enhance gp_stats_check with it, until that, please take it into consideration while verifying outputs. 
+Note: With Greenplum new optimizer ORCA, stats on top level partitions are important and are used for evaluating best plan. Statistics on child partitions are not required. Yet to enhance gp_stats_check with it, until that, please take it into consideration while verifying outputs.
+
     [INFO]:- Execution started. Please refer to log file name: gp_stats_check_20150411204037.log for details in current working directory.
     [INFO]:- Input query will be executed using the legacy planner.
     [INFO]:- No of tables scanned during user query execution: 8.
