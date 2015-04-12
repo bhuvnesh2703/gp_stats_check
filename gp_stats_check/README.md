@@ -4,7 +4,7 @@ Brief: Python utility to identify tables with outdated statistics involved in a 
 
 Usage: gp_stats_check [options] ./gp_stats_check -f query1.sql -p database port
 
-Options: 
+```Options: 
 -h, --help					show this help message and exit 
 -f QUERYFILE, --queryfile=QUERYFILE		Filename holding SQL 
 -?, --usage 
@@ -12,4 +12,4 @@ Options:
 
 Database specific optional arguments: 
 -p PORT, --port=PORT				Port of database to connect [default: 5432] 
--d DATABASE, --database=DATABASE		Name of the database to connect [default: template1]
+-d DATABASE, --database=DATABASE		Name of the database to connect [default: template1]```
