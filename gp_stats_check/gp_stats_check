@@ -7,7 +7,6 @@ compare it with the reltuples value stored in pg_class. If the difference betwee
 a defined percentage, stats are considered to be up-to-date else are marked as outdated. It will also capture explain
 plan for the query in the log file in current working directory
 
-Date: 07/10/2014
 Please report bugs to bhuvnesh2703@gmail.com
 """
 
