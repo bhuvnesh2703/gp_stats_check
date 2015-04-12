@@ -13,4 +13,3 @@ Options:
 Database specific optional arguments: 
 -p PORT, --port=PORT				Port of database to connect [default: 5432] 
 -d DATABASE, --database=DATABASE		Name of the database to connect [default: template1]
-```
