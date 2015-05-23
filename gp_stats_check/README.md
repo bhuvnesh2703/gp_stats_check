@@ -18,6 +18,8 @@ Python utility to identify tables with outdated statistics involved in a query. 
     Database specific optional arguments: 
     -p PORT, --port=PORT                        Port of database to connect [default: 5432] 
     -d DATABASE, --database=DATABASE            Name of the database to connect [default: template1]
+    -u USER, --user=USER                        User to connect to database [default: User who executes the script]
+    -s SERVER, --server=SERVER                  Database server hostname [default: localhost]
 
 
 ##Example output:
