@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 """
-The purpose of this utility is to identify tables with outdated statistics involved in a query. It accepts an input
-query file of the form: EXPLAIN VERBOSE query. It will execute the input file and scan explain verbose plan of the
-query to identify the scanned tables. It will execute a query to check count of records on the identified table and
-compare it with the reltuples value stored in pg_class. If the difference between record count and reltuples is within
-a defined percentage, stats are considered to be up-to-date else are marked as outdated. It will also capture explain
-plan for the query in the log file in current working directory
+The purpose of this utility is to identify tables with outdated statistics involved in a query. It accepts an input query file of the form: EXPLAIN VERBOSE query. It will execute the input file and scan explain verbose plan of the query to identify the scanned tables. It will execute a query to check count of records on the identified table and compare it with the reltuples value stored in pg_class. If the difference between record count and reltuples is within a defined percentage, stats are considered to be up-to-date else are marked as outdated. It will also capture explain plan for the query in the log file in current working directory
 
 Please report bugs to bhuvnesh2703@gmail.com
 """
@@ -19,6 +14,7 @@ try:
     import sys
     import re
     import time
+    import getpass
 except ImportError:
     print "Cannot import modules, Please source greenplum_path.sh"
 
@@ -140,9 +136,10 @@ def prepare_output_summary(final_output, header):
         summary_output.append(record)
 
     result, top_border_length = list_to_tabular_formatting(summary_output, header)
-    print("Stat check summary".center(top_border_length))
-    print "-" * top_border_length
-    print result.strip('\n')
+    #print("Stat check summary".center(top_border_length))
+    #print "-" * top_border_length
+    #print result.strip('\n')
+    logger.info("Stat check summary\n%s\n%s" % (("-" * top_border_length), result))
     logger.info(
         "Differences between record count and estimated count higher than %d%% variation suggests outdated stats"
         % variation_permitted)
@@ -174,7 +171,7 @@ Create a sql file with analyze statements
     else:
         subprocess.call(['rm -f %s' % analyze_sql_filename], shell=True, stdout=subprocess.PIPE)
 
-    logger.debug("Final result is : \n%s" % result)
+    #logger.info("Final result is : \n%s" % result)
 
 
 '''
@@ -334,7 +331,7 @@ initialize_db_connection is used to verify if a connection can be established wi
 """
 
 
-def initialize_db_connection(params):
+def initialize_db_connection(db_connection_params):
     try:
         db_connection_object = pgdb.connect(**db_connection_params)
         return db_connection_object
@@ -356,10 +353,15 @@ if __name__ == "__main__":
                      help="Port of database to connect [default: 5432]")
     group.add_option("-d", "--database", action="store", default='template1',
                      help="Name of the database to connect [default: template1]")
+    group.add_option("-u", "--user", action="store", default=getpass.getuser(),
+                     help="Name of the user to connect to database [default: User who executes the script")
+    group.add_option("-s", "--server", action="store", default='localhost',
+                     help="Hostname used for database connection")
     parser.add_option_group(group)
     parser.add_option("-f", "--queryfile", dest="queryfile", action="store", help="Filename holding SQL")
     parser.add_option("-?", "--usage", dest="usage", action="store_false")
     parser.add_option("-v", "--version", dest="version", action="store_false")
+    parser.add_option("-V", "--verbose", dest="verbose", action="store_false")
     (options, args) = parser.parse_args()
 
     '''
@@ -373,12 +375,15 @@ Capture values of options
     port = options.port
     os.environ['PGPORT'] = str(port)
     database = options.database
+    user = options.user
+    host = options.server
+    verbose = options.verbose
 
     '''
 Initialize some variables used during execution
 '''
     timeStamp = time.strftime("%Y%m%d%H%M%S")
-    db_connection_params = {'host': 'localhost', 'database': database, 'user': 'gpadmin'}
+    db_connection_params = {'host': host, 'database': database, 'user': user}
     variation_permitted = 5.0
     analyze_sql_filename = os.path.basename(__file__).strip('.py') + '_' + timeStamp + '.sql'
 
@@ -387,8 +392,13 @@ Create loggers, logger.info to write on console. logger.debug and logger.info me
 '''
     logger = logging.getLogger('%s ' % os.path.basename(__file__))
     prefix_for_files = os.path.basename(__file__).strip('.py')
+    if verbose is None:
+        logging_level = logging.INFO
+    else:
+        logging_level = logging.DEBUG
+
     try:
-        logging.basicConfig(level=logging.DEBUG, \
+        logging.basicConfig(level=logging_level, \
                             format='%(asctime)s [%(levelname)s] %(message)s', \
                             datefmt='%Y-%m-%d %H:%M', \
                             filename=prefix_for_files + '_' + timeStamp + '.log', \
